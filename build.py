@@ -26,6 +26,9 @@ JENKINS_JOB_NAME = sys.argv[4]
 JENKINS_JOB_PARAMS = optional_arg(sys.argv, 5, '{}')
 JENKINS_WAIT_JOB = optional_arg(sys.argv, 6, "wait")
 
+for i in os.environ:
+    print(i)
+
 # Setup Jenkins Connection and start build
 connection = jenkins.Jenkins(JENKINS_URL, JENKINS_USERNAME, JENKINS_TOKEN)
 queue_id = connection.build_job(JENKINS_JOB_NAME, parameters=json.loads(JENKINS_JOB_PARAMS), token=JENKINS_TOKEN)
@@ -97,7 +100,7 @@ if status in ['SUCCESS']:
     # check if this pull request has a duplicated comment
     old_comments = [c.body for c in pr.get_issue_comments()]
     if comment in old_comments:
-        print('This pull request already a duplicated comment.')
+        print('This pull request already has a duplicated comment.')
     else:
         # add the comment
         pr.create_issue_comment(comment)
