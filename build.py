@@ -74,10 +74,13 @@ while True:
 print(f"Build completed with status: {status}")
 print(f"::set-output name=job_status::{status}")
 
-log = connection.get_build_console_output(JENKINS_JOB_NAME, build_number).splitlines()
-for i in range(len(log)):
-    if any("[OUTPUT]" in log[i]):
-        print(log[i])
+if status in ['SUCCESS']:
+    log = connection.get_build_console_output(JENKINS_JOB_NAME, build_number).splitlines()
+    filtered_log = []
+    for i in range(len(log)):
+        if "[OUTPUT]" in log[i]:
+            filtered_log.append(log[i].replace("[OUTPUT]", ""))
+    print(("\n").join(line for line in filtered_log))
 
 if status not in ['SUCCESS', 'UNSTABLE']:
     exit(1)
