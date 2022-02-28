@@ -86,7 +86,7 @@ if status in ['SUCCESS']:
     filtered_log = []
     for i in range(len(log)):
         if "[OUTPUT]" in log[i]:
-            filtered_log.append(log[i].replace("[OUTPUT]", ""))
+            filtered_log.append(log[i][(log[i].rindex("[OUTPUT]") + 8):])
     comment = ("\n").join(line for line in filtered_log)    
     
     # search a pull request that triggered this action
