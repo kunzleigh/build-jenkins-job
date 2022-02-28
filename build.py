@@ -82,29 +82,26 @@ print(f"Build completed with status: {status}")
 print(f"::set-output name=job_status::{status}")
 
 if status in ['SUCCESS']:
-    try:
-        log = connection.get_build_console_output(JENKINS_JOB_NAME, build_number).splitlines()
-        filtered_log = []
-        for i in range(len(log)):
-            if "[OUTPUT]" in log[i]:
-                filtered_log.append(log[i].replace("[OUTPUT]", ""))
-        comment = ("\n").join(line for line in filtered_log)    
-        
-        # search a pull request that triggered this action
-        gh = Github(os.getenv('GITHUB_TOKEN'))
-        event = read_json(os.getenv('GITHUB_EVENT_PATH'))
-        repo = gh.get_repo(os.getenv('REPOSITORY'))
-        pr = repo.get_pull(os.getenv('PR_NUMBER'))
+    log = connection.get_build_console_output(JENKINS_JOB_NAME, build_number).splitlines()
+    filtered_log = []
+    for i in range(len(log)):
+        if "[OUTPUT]" in log[i]:
+            filtered_log.append(log[i].replace("[OUTPUT]", ""))
+    comment = ("\n").join(line for line in filtered_log)    
+    
+    # search a pull request that triggered this action
+    gh = Github(os.getenv('GITHUB_TOKEN'))
+    event = read_json(os.getenv('GITHUB_EVENT_PATH'))
+    repo = gh.get_repo(os.getenv('REPOSITORY'))
+    pr = repo.get_pull(os.getenv('PR_NUMBER'))
 
-        # check if this pull request has a duplicated comment
-        old_comments = [c.body for c in pr.get_issue_comments()]
-        if comment in old_comments:
-            print('This pull request already a duplicated comment.')
-        else:
-            # add the comment
-            pr.create_issue_comment(comment)
-    except:
-        print("PR comment failed")
+    # check if this pull request has a duplicated comment
+    old_comments = [c.body for c in pr.get_issue_comments()]
+    if comment in old_comments:
+        print('This pull request already a duplicated comment.')
+    else:
+        # add the comment
+        pr.create_issue_comment(comment)
 
 if status not in ['SUCCESS', 'UNSTABLE']:
     exit(1)
