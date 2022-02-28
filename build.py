@@ -92,7 +92,7 @@ if status in ['SUCCESS']:
     # search a pull request that triggered this action
     gh = Github(os.environ['GITHUB_TOKEN'])
     repo = gh.get_repo(os.environ['GITHUB_REPOSITORY'])
-    pr = repo.get_pull(os.environ['PR_NUMBER'])
+    pr = repo.get_pull(int(os.environ['PR_NUMBER']))
 
     # check if this pull request has a duplicated comment
     old_comments = [c.body for c in pr.get_issue_comments()]
