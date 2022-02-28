@@ -90,8 +90,7 @@ if status in ['SUCCESS']:
     comment = ("\n").join(line for line in filtered_log)    
     
     # search a pull request that triggered this action
-    gh = Github(os.getenv('GITHUB_TOKEN'))
-    print('testenviron:', os.environ['GITHUB_REPOSITORY'])
+    gh = Github(os.environ['GITHUB_TOKEN'])
     repo = gh.get_repo(os.environ['GITHUB_REPOSITORY'])
     pr = repo.get_pull(os.environ['PR_NUMBER'])
 
