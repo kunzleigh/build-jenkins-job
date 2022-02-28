@@ -87,24 +87,23 @@ if status in ['SUCCESS']:
         filtered_log = []
         for i in range(len(log)):
             if "[OUTPUT]" in log[i]:
-                filtered_log.append(log[i].replace("[OUTPUT]", ""))
+                filtered_log.append(log[i][(log[i].rindex("[OUTPUT]") + 8):])
         comment = ("\n").join(line for line in filtered_log)    
         
         # search a pull request that triggered this action
-        gh = Github(os.getenv('GITHUB_TOKEN'))
-        event = read_json(os.getenv('GITHUB_EVENT_PATH'))
-        repo = gh.get_repo(os.getenv('REPOSITORY'))
-        pr = repo.get_pull(os.getenv('PR_NUMBER'))
+        gh = Github(os.environ['GITHUB_TOKEN'])
+        repo = gh.get_repo(os.environ['GITHUB_REPOSITORY'])
+        pr = repo.get_pull(int(os.environ['PR_NUMBER']))
 
         # check if this pull request has a duplicated comment
         old_comments = [c.body for c in pr.get_issue_comments()]
         if comment in old_comments:
-            print('This pull request already a duplicated comment.')
+            print('This pull request already has a duplicated comment.')
         else:
             # add the comment
             pr.create_issue_comment(comment)
     except:
-        print("PR comment failed")
+        print("Failed to comment PR output")
 
 if status not in ['SUCCESS', 'UNSTABLE']:
     exit(1)
