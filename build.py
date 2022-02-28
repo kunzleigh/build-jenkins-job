@@ -26,9 +26,6 @@ JENKINS_JOB_NAME = sys.argv[4]
 JENKINS_JOB_PARAMS = optional_arg(sys.argv, 5, '{}')
 JENKINS_WAIT_JOB = optional_arg(sys.argv, 6, "wait")
 
-for i in os.environ:
-    print(i)
-
 # Setup Jenkins Connection and start build
 connection = jenkins.Jenkins(JENKINS_URL, JENKINS_USERNAME, JENKINS_TOKEN)
 queue_id = connection.build_job(JENKINS_JOB_NAME, parameters=json.loads(JENKINS_JOB_PARAMS), token=JENKINS_TOKEN)
@@ -94,8 +91,8 @@ if status in ['SUCCESS']:
     
     # search a pull request that triggered this action
     gh = Github(os.getenv('GITHUB_TOKEN'))
-    repo = gh.get_repo(os.getenv('REPOSITORY'))
-    pr = repo.get_pull(os.getenv('PR_NUMBER'))
+    repo = gh.get_repo(os.getenv('GITHUB_REPOSITORY'))
+    pr = repo.get_pull(os.environ['PR_NUMBER'])
 
     # check if this pull request has a duplicated comment
     old_comments = [c.body for c in pr.get_issue_comments()]
