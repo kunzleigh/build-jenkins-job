@@ -91,7 +91,6 @@ if status in ['SUCCESS']:
     
     # search a pull request that triggered this action
     gh = Github(os.getenv('GITHUB_TOKEN'))
-    event = read_json(os.getenv('GITHUB_EVENT_PATH'))
     repo = gh.get_repo(os.getenv('REPOSITORY'))
     pr = repo.get_pull(os.getenv('PR_NUMBER'))
 
