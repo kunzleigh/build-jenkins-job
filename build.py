@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import sys
 import time
 import jenkins
@@ -6,6 +7,12 @@ import json
 import requests
 import urllib3
 import json
+from github import Github
+
+
+def read_json(filepath):
+    with open(filepath, 'r') as f:
+        return json.load(f)
 
 # Arguments
 optional_arg = lambda argv, index, default: default if (len(argv) <= index or argv == "") else argv[index]
@@ -80,7 +87,30 @@ if status in ['SUCCESS']:
     for i in range(len(log)):
         if "[OUTPUT]" in log[i]:
             filtered_log.append(log[i].replace("[OUTPUT]", ""))
-    print(("\n").join(line for line in filtered_log))
+    comment = ("\n").join(line for line in filtered_log)    
+    
+    # search a pull request that triggered this action
+    gh = Github(os.getenv('GITHUB_TOKEN'))
+    event = read_json(os.getenv('GITHUB_EVENT_PATH'))
+    branch_label = event['pull_request']['head']['label']  # author:branch
+    branch_name = branch_label.split(':')[-1]
+    repo = gh.get_repo(event['repository']['full_name'])
+    prs = repo.get_pulls(state='open', sort='created', head=branch_label)
+    pr = prs[0]
+
+    # build a comment
+    pr_info = {
+        'pull_id': pr.number,
+        'branch_name': branch_name
+    }
+
+    # check if this pull request has a duplicated comment
+    old_comments = [c.body for c in pr.get_issue_comments()]
+    if comment in old_comments:
+        print('This pull request already a duplicated comment.')
+    else:
+        # add the comment
+        pr.create_issue_comment(comment)
 
 if status not in ['SUCCESS', 'UNSTABLE']:
     exit(1)
