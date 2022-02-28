@@ -82,25 +82,28 @@ print(f"Build completed with status: {status}")
 print(f"::set-output name=job_status::{status}")
 
 if status in ['SUCCESS']:
-    log = connection.get_build_console_output(JENKINS_JOB_NAME, build_number).splitlines()
-    filtered_log = []
-    for i in range(len(log)):
-        if "[OUTPUT]" in log[i]:
-            filtered_log.append(log[i][(log[i].rindex("[OUTPUT]") + 8):])
-    comment = ("\n").join(line for line in filtered_log)    
-    
-    # search a pull request that triggered this action
-    gh = Github(os.environ['GITHUB_TOKEN'])
-    repo = gh.get_repo(os.environ['GITHUB_REPOSITORY'])
-    pr = repo.get_pull(int(os.environ['PR_NUMBER']))
+    try:
+        log = connection.get_build_console_output(JENKINS_JOB_NAME, build_number).splitlines()
+        filtered_log = []
+        for i in range(len(log)):
+            if "[OUTPUT]" in log[i]:
+                filtered_log.append(log[i][(log[i].rindex("[OUTPUT]") + 8):])
+        comment = ("\n").join(line for line in filtered_log)    
+        
+        # search a pull request that triggered this action
+        gh = Github(os.environ['GITHUB_TOKEN'])
+        repo = gh.get_repo(os.environ['GITHUB_REPOSITORY'])
+        pr = repo.get_pull(int(os.environ['PR_NUMBER']))
 
-    # check if this pull request has a duplicated comment
-    old_comments = [c.body for c in pr.get_issue_comments()]
-    if comment in old_comments:
-        print('This pull request already has a duplicated comment.')
-    else:
-        # add the comment
-        pr.create_issue_comment(comment)
+        # check if this pull request has a duplicated comment
+        old_comments = [c.body for c in pr.get_issue_comments()]
+        if comment in old_comments:
+            print('This pull request already has a duplicated comment.')
+        else:
+            # add the comment
+            pr.create_issue_comment(comment)
+    except:
+        print("Failed to comment PR output")
 
 if status not in ['SUCCESS', 'UNSTABLE']:
     exit(1)
