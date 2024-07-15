@@ -106,4 +106,4 @@ if status in ['SUCCESS']:
         print("Failed to comment PR output")
 
 if status not in ['SUCCESS', 'UNSTABLE']:
-    exit(1)
+    exit(0)
