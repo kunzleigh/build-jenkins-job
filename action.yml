@@ -35,8 +35,8 @@ runs:
     - ${{ inputs.jenkins-token}}
     - ${{ inputs.jenkins-user}}
     - ${{ inputs.jenkins-job }}
-    - ${{ inputs.jenkins-job-params}}
     - ${{ inputs.jenkins-wait-job }}
+    - ${{ inputs.jenkins-job-params}}
 branding:
   icon: 'arrow-up-right'
   color: 'yellow'

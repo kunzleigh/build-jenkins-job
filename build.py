@@ -15,16 +15,17 @@ def read_json(filepath):
         return json.load(f)
 
 # Arguments
-optional_arg = lambda argv, index, default: default if (len(argv) <= index or argv == "") else argv[index]
-if len(sys.argv) < 4:
+# Positional order must match the args list in action.yml
+optional_arg = lambda argv, index, default: default if (len(argv) <= index or argv[index] == "") else argv[index]
+if len(sys.argv) < 5:
     raise ValueError("Required fields: jenkins url, jenkins api token, jenkins username and jenkins job")
 
 JENKINS_URL = sys.argv[1]
 JENKINS_TOKEN = sys.argv[2]
 JENKINS_USERNAME = sys.argv[3]
 JENKINS_JOB_NAME = sys.argv[4]
-JENKINS_JOB_PARAMS = optional_arg(sys.argv, 5, '{}')
-JENKINS_WAIT_JOB = optional_arg(sys.argv, 6, "wait")
+JENKINS_WAIT_JOB = optional_arg(sys.argv, 5, "wait")
+JENKINS_JOB_PARAMS = optional_arg(sys.argv, 6, '{}')
 
 # Setup Jenkins Connection and start build
 connection = jenkins.Jenkins(JENKINS_URL, JENKINS_USERNAME, JENKINS_TOKEN)
